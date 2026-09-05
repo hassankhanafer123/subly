@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Subly — Warm & Human</title>
+<style>
+  :root{
+    --paper:#F3E9DA;      /* warm sand background */
+    --paper2:#EFE2CF;
+    --card:#FBF6EC;       /* cream card */
+    --ink:#2B2521;        /* warm near-black */
+    --ink2:#4A4038;
+    --muted:#8A7B6B;      /* warm taupe */
+    --faint:#B0A28E;
+    --line:#E4D7C2;       /* warm hairline */
+    --terra:#C25B3A;      /* terracotta primary */
+    --terra-deep:#A5462A;
+    --terra-soft:#F3DDD0;
+    --teal:#215E56;       /* deep teal secondary */
+    --teal-soft:#D7E6E1;
+    --gold:#B8863B;
+    --serif:'Iowan Old Style','Palatino Linotype','Georgia',serif;
+    --san:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#ded0bb;font-family:var(--san);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .rail{max-width:440px;margin:0 auto;padding:28px 16px 80px}
+  .cap{font-family:var(--san);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#8c7c64;margin:34px 6px 12px}
+  .cap:first-child{margin-top:0}
+  .screen{background:var(--paper);border-radius:30px;overflow:hidden;box-shadow:0 22px 55px -22px rgba(60,40,20,.4);position:relative}
+  .sb{display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font-size:14px;font-weight:700;color:var(--ink)}
+  .scroll{max-height:730px;overflow-y:auto}
+  .scroll::-webkit-scrollbar{display:none}
+  h1{font-family:var(--serif);font-weight:700;letter-spacing:-.2px;line-height:1.05}
+  h2{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:-.2px}
+  .pad{padding:0 24px}
+  .muted{color:var(--muted)} .faint{color:var(--faint);font-size:13px}
+  .serif{font-family:var(--serif)}
+  /* brand */
+  .brandrow{display:flex;align-items:center;gap:9px}
+  .mk{width:34px;height:34px;border-radius:11px;background:var(--terra);display:grid;place-items:center;transform:rotate(-6deg);box-shadow:0 4px 10px rgba(160,70,42,.35)}
+  .mk svg{width:18px;height:18px;stroke:#FBF6EC;fill:none;stroke-width:2}
+  .brand{font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:-.3px}
+  /* tab bar */
+  .tabs{display:flex;justify-content:space-around;align-items:center;padding:12px 6px 24px;border-top:1px solid var(--line);background:var(--paper2)}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--faint);letter-spacing:.02em}
+  .tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9}
+  .tab.on{color:var(--terra)}
+  /* buttons */
+  .btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;height:54px;border:0;border-radius:16px;background:var(--terra);color:#FBF6EC;font-family:var(--san);font-size:16px;font-weight:700;letter-spacing:-.2px;cursor:pointer;box-shadow:0 8px 18px -8px rgba(160,70,42,.6)}
+  .btn.teal{background:var(--teal);box-shadow:0 8px 18px -8px rgba(33,94,86,.6)}
+  .btn.o{background:transparent;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+  /* pills */
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-size:13.5px;font-weight:600;color:var(--ink2);white-space:nowrap}
+  .pill.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .pill.terra{background:var(--terra);border-color:var(--terra);color:#FBF6EC}
+  .frow{display:flex;gap:9px;overflow-x:auto;padding-bottom:2px}
+  .frow::-webkit-scrollbar{display:none}
+  .row{display:flex;gap:9px;flex-wrap:wrap}
+  /* field */
+  .lbl{font-size:13px;font-weight:700;margin:0 0 8px;color:var(--ink2)}
+  .inp{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:15px 16px;font-family:var(--san);font-size:15px;color:var(--ink);background:var(--card)}
+  .inp.ph{color:var(--faint)}
+  /* hero */
+  .hero{position:relative;height:340px}
+  .hero img{width:100%;height:100%;object-fit:cover;display:block}
+  .hero .wash{position:absolute;inset:0;background:linear-gradient(180deg,rgba(70,40,20,.28) 0%,rgba(70,40,20,.05) 34%,rgba(43,30,20,.72) 100%);mix-blend-mode:multiply}
+  .hero .tint{position:absolute;inset:0;background:var(--terra);opacity:.10;mix-blend-mode:overlay}
+  .hero .ov{position:absolute;left:24px;right:24px;bottom:28px;color:#FBF6EC}
+  .eyebrow{font-family:var(--san);font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:rgba(251,246,236,.85);margin-bottom:10px}
+  .hero h1{color:#FBF6EC;font-size:34px}
+  .hero p{color:rgba(251,246,236,.92);font-size:14.5px;line-height:1.5;margin-top:10px}
+  .sheet{position:relative;margin-top:-26px;background:var(--paper);border-radius:28px 28px 0 0;padding:22px 0 10px}
+  .grip{width:42px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 18px}
+  .trust{display:flex;justify-content:space-between;padding:22px 6px 4px;border-top:1px dashed var(--line);margin-top:22px}
+  .trust div{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--ink2);flex:1;text-align:center}
+  .trust .ic{width:34px;height:34px;border-radius:50%;background:var(--teal-soft);display:grid;place-items:center}
+  .trust svg{width:16px;height:16px;stroke:var(--teal);fill:none;stroke-width:2}
+  /* LISTING — luggage tag card */
+  .lc{margin:0 24px 24px;background:var(--card);border-radius:22px;border:1px solid var(--line);overflow:hidden;box-shadow:0 10px 26px -18px rgba(60,40,20,.5)}
+  .lc .ph{position:relative;aspect-ratio:16/11}
+  .lc .ph img{width:100%;height:100%;object-fit:cover;display:block}
+  .seal{position:absolute;top:12px;left:12px;display:inline-flex;align-items:center;gap:5px;background:var(--teal);color:#FBF6EC;padding:6px 11px 6px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.03em;box-shadow:0 4px 10px rgba(33,94,86,.4)}
+  .seal svg{width:13px;height:13px;stroke:#FBF6EC;fill:none;stroke-width:2.2}
+  .bkmk{position:absolute;top:0;right:16px;width:30px;height:40px;background:var(--card);clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%);display:grid;place-items:start center;padding-top:7px}
+  .bkmk svg{width:15px;height:15px;stroke:var(--terra);fill:none;stroke-width:2}
+  .lc .body{padding:14px 16px 16px}
+  .lc .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .lc .place{font-family:var(--serif);font-size:18px;font-weight:700}
+  .lc .rtag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;color:var(--teal);background:var(--teal-soft);padding:4px 9px;border-radius:6px;white-space:nowrap}
+  .lc .desc{color:var(--muted);font-size:14px;margin-top:3px}
+  .tagline{display:flex;align-items:center;gap:7px;margin-top:10px;padding-top:11px;border-top:1px dashed var(--line)}
+  .tagline .dt{color:var(--muted);font-size:12.5px;font-weight:600}
+  .lc .price{margin-left:auto;font-family:var(--serif);font-size:19px;font-weight:700;color:var(--terra-deep)}
+  .lc .price span{font-family:var(--san);font-size:12px;color:var(--muted);font-weight:600}
+  /* detail */
+  .circ{position:absolute;top:16px;width:38px;height:38px;border-radius:50%;background:var(--card);display:grid;place-items:center;box-shadow:0 4px 12px rgba(60,40,20,.3)}
+  .circ svg{width:19px;height:19px;stroke:var(--ink);fill:none;stroke-width:2}
+  .stats{display:flex;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:20px}
+  .stats div{flex:1;padding:15px 10px;text-align:center;border-right:1px dashed var(--line)}
+  .stats div:last-child{border-right:0}
+  .stats .k{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .stats .v{font-family:var(--serif);font-size:18px;font-weight:700;margin-top:4px}
+  .hr{height:1px;background:var(--line);margin:22px 24px}
+  .hostrow{display:flex;align-items:center;gap:13px;padding:0 24px}
+  .av{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--card);box-shadow:0 0 0 1px var(--line)}
+  .msgbox{border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;color:var(--faint);font-size:14px;min-height:58px;background:var(--card)}
+  /* photo upload */
+  .thumbs{display:flex;gap:11px;overflow-x:auto;padding-bottom:2px}
+  .thumbs::-webkit-scrollbar{display:none}
+  .add{flex:0 0 84px;height:84px;border-radius:15px;border:1.8px dashed var(--terra);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--terra);font-size:11px;font-weight:700;background:var(--terra-soft)}
+  .add svg{width:22px;height:22px;stroke:var(--terra);fill:none;stroke-width:1.8}
+  .thumb{flex:0 0 84px;height:84px;border-radius:15px;object-fit:cover}
+  .tg{width:52px;height:31px;border-radius:999px;background:var(--teal);position:relative;flex:0 0 auto}
+  .tg::after{content:'';position:absolute;top:3px;right:3px;width:25px;height:25px;border-radius:50%;background:#FBF6EC}
+  .calc{background:var(--teal);color:#FBF6EC;border-radius:18px;padding:18px 20px;margin-top:20px}
+  .calc .l{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;color:rgba(251,246,236,.8)}
+  .calc .l.big{border-top:1px dashed rgba(251,246,236,.3);margin-top:8px;padding-top:13px}
+  .calc .l.big b{font-family:var(--serif);font-size:17px;color:#FBF6EC}
+  .calc .l.big .keep{font-family:var(--serif);font-size:22px;font-weight:700;color:#FBF6EC}
+  /* deals */
+  .sec{font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 24px 11px}
+  .dcard{margin:0 24px 16px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:17px}
+  .tagm{font-family:var(--san);font-size:10.5px;font-weight:800;letter-spacing:.06em;color:var(--teal);background:var(--teal-soft);padding:4px 9px;border-radius:6px}
+  .ledger{background:var(--paper2);border-radius:14px;padding:13px 15px;margin:13px 0 15px}
+  .ledger .l{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13.5px;color:var(--muted)}
+  .held{font-size:10.5px;font-weight:800;color:var(--teal);background:var(--teal-soft);padding:4px 10px;border-radius:999px}
+  /* payments */
+  .card{margin:0 24px 14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:17px}
+  .demo{font-size:10.5px;font-weight:800;color:var(--gold);background:#F2E6CC;padding:4px 11px;border-radius:999px}
+  .verok{font-size:10.5px;font-weight:800;color:var(--teal);background:var(--teal-soft);padding:4px 11px;border-radius:999px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 24px 14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:17px}
+  .stat .k{font-size:12px;color:var(--muted);font-weight:700}
+  .stat .v{font-family:var(--serif);font-size:30px;font-weight:700;letter-spacing:-.5px;margin-top:4px}
+  .prot{display:flex;gap:12px;align-items:flex-start;padding:9px 0}
+  .prot .pic{width:30px;height:30px;border-radius:9px;background:var(--terra-soft);display:grid;place-items:center;flex:0 0 auto}
+  .prot svg{width:16px;height:16px;stroke:var(--terra);fill:none;stroke-width:2}
+  .prot p{font-size:13.5px;color:var(--ink2);line-height:1.45}
+</style>
+</head>
+<body>
+<div class="rail">
+
+<!-- 1. ONBOARDING -->
+<div class="cap">1 · Onboarding</div>
+<div class="screen">
+  <div class="scroll">
+    <div class="hero">
+      <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80"/>
+      <div class="wash"></div><div class="tint"></div>
+      <div class="ov">
+        <div class="brandrow" style="margin-bottom:16px"><span class="mk"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="4.5"/><path d="M11 11l8 8M17 17l2-2M15 19l2-2"/></svg></span><span class="brand" style="color:#FBF6EC">subly</span></div>
+        <div class="eyebrow">While you're away</div>
+        <h1>Someone to hold<br>the keys.</h1>
+        <p>Traveling, on assignment, or gone for the season? Hand your home to a vetted subletter — keep ~75% of your rent, we handle the rest.</p>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <div class="pad">
+        <h2>Let's get you set up</h2>
+        <p class="muted" style="margin:6px 0 22px;font-size:14px">Takes 20 seconds. Look around first if you like.</p>
+        <div class="lbl">Your name</div>
+        <div class="inp" style="margin-bottom:16px">Jordan Rivera</div>
+        <div class="lbl">Email</div>
+        <div class="inp ph" style="margin-bottom:20px">jordan@email.com</div>
+        <div class="lbl">Your city</div>
+        <div class="frow" style="margin-bottom:20px"><span class="pill on">Boston</span><span class="pill">New York</span><span class="pill">SF</span><span class="pill">LA</span><span class="pill">Chicago</span></div>
+        <div class="lbl">Why are you away?</div>
+        <div class="row" style="margin-bottom:24px"><span class="pill terra">✈ Traveling</span><span class="pill">💻 Working remote</span><span class="pill">🎒 On assignment</span><span class="pill">☀ For the season</span></div>
+        <button class="btn">Get started →</button>
+        <div class="trust">
+          <div><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>Vetted takers</div>
+          <div><span class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>Escrow-safe</div>
+          <div><span class="ic"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="4"/><path d="M11 11l8 8M17 17l2-2"/></svg></span>Keep ~75%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. EXPLORE -->
+<div class="cap">2 · Explore</div>
+<div class="screen">
+  <div class="sb"><span>9:41</span><span style="font-weight:700">􀙇 􀛨 􀋦</span></div>
+  <div class="pad" style="padding-top:8px"><div class="eyebrow" style="color:var(--terra);margin-bottom:6px">Homes waiting for a keeper</div><h1 style="font-size:30px">Find a place</h1></div>
+  <div class="frow pad" style="margin:16px 0 20px"><span class="pill on">All cities</span><span class="pill">Boston</span><span class="pill">New York</span><span class="pill">SF</span><span class="pill">LA</span></div>
+  <div class="scroll" style="max-height:540px">
+    <div class="lc">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80"/><span class="seal"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Verified</span><span class="bkmk"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span></div>
+      <div class="body">
+        <div class="top"><span class="place">Fenway, Boston</span><span class="rtag">🎒 On assignment</span></div>
+        <div class="desc">Sunny room in a bright Fenway apartment</div>
+        <div class="tagline"><svg width="14" height="14" viewBox="0 0 24 24" style="stroke:var(--muted);fill:none;stroke-width:2"><circle cx="8" cy="8" r="4"/><path d="M11 11l7 7"/></svg><span class="dt">Jun 1 – Aug 31 · 3 months</span><span class="price">$1,050<span> /mo</span></span></div>
+      </div>
+    </div>
+    <div class="lc">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"/><span class="seal"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Verified</span><span class="bkmk"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span></div>
+      <div class="body">
+        <div class="top"><span class="place">Williamsburg, NY</span><span class="rtag">💻 Working remote</span></div>
+        <div class="desc">Cozy 1-bed steps from the L train</div>
+        <div class="tagline"><svg width="14" height="14" viewBox="0 0 24 24" style="stroke:var(--muted);fill:none;stroke-width:2"><circle cx="8" cy="8" r="4"/><path d="M11 11l7 7"/></svg><span class="dt">Sep 1 – Dec 20 · 4 months</span><span class="price">$1,950<span> /mo</span></span></div>
+      </div>
+    </div>
+    <div class="lc">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800&q=80"/><span class="seal"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Verified</span><span class="bkmk"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span></div>
+      <div class="body">
+        <div class="top"><span class="place">Back Bay, Boston</span><span class="rtag">✈ Traveling</span></div>
+        <div class="desc">Furnished studio, away for the summer</div>
+        <div class="tagline"><svg width="14" height="14" viewBox="0 0 24 24" style="stroke:var(--muted);fill:none;stroke-width:2"><circle cx="8" cy="8" r="4"/><path d="M11 11l7 7"/></svg><span class="dt">Jul 1 – Dec 31 · 6 months</span><span class="price">$1,350<span> /mo</span></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab on"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Find</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="4"/><path d="M12 12l7 7M17 17l2-2"/></svg>Lend</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Deals</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Wallet</div>
+  </div>
+</div>
+
+<!-- 3. LISTING DETAIL -->
+<div class="cap">3 · Listing detail</div>
+<div class="screen">
+  <div class="scroll">
+    <div class="hero" style="height:310px">
+      <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80"/>
+      <div class="tint"></div>
+      <span class="circ" style="left:16px"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span>
+      <span class="circ" style="right:16px"><svg viewBox="0 0 24 24" style="stroke:var(--terra)"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+    </div>
+    <div class="pad" style="padding-top:20px">
+      <div class="eyebrow" style="color:var(--terra);margin-bottom:8px">🎒 Away on assignment</div>
+      <h2 style="font-size:26px">Fenway, Boston</h2>
+      <p style="margin-top:6px">Sunny room in a bright Fenway apartment</p>
+      <p class="faint" style="margin-top:5px">123 Hemenway St, Boston</p>
+      <div class="stats"><div><div class="k">Rent</div><div class="v" style="color:var(--terra-deep)">$1,050</div></div><div><div class="k">For</div><div class="v">3 months</div></div><div><div class="k">Keeper</div><div class="v">Maya</div></div></div>
+    </div>
+    <div class="hr"></div>
+    <div class="pad"><h2 style="font-size:18px;margin-bottom:9px">About this place</h2><p class="muted" style="font-size:14px;line-height:1.55">Bright corner room with a shared kitchen and living room. Five minutes to the T, laundry in the building. Dates are a little flexible — send me a note.</p></div>
+    <div style="height:20px"></div>
+    <div class="hostrow"><img class="av" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80"/><div><div class="serif" style="font-weight:700;font-size:16px">Maya Chen</div><div class="faint">Verified keeper · replies within a day</div></div></div>
+    <div class="pad" style="margin-top:20px">
+      <div class="lbl">A note to Maya</div>
+      <div class="msgbox">Tell her a little about yourself…</div>
+      <div style="height:14px"></div>
+      <button class="btn">Ask to take the keys</button>
+      <p class="faint" style="text-align:center;margin-top:13px;line-height:1.45">Rent &amp; deposit are held in escrow by Subly.<br>You never hand cash to a stranger.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 4. LEND YOUR PLACE -->
+<div class="cap">4 · Lend your place</div>
+<div class="screen">
+  <div class="sb"><span>9:41</span><span style="font-weight:700">􀙇 􀛨 􀋦</span></div>
+  <div class="scroll" style="max-height:650px">
+    <div class="pad" style="padding-top:8px"><div class="eyebrow" style="color:var(--terra);margin-bottom:6px">Hand over the keys</div><h1 style="font-size:28px">Lend your place</h1><p class="muted" style="font-size:14px;margin-top:6px">Photos, dates, price. We verify it, find a keeper, and hold the money.</p></div>
+    <div class="pad" style="margin-top:22px"><div class="lbl">Your room</div><div class="thumbs"><div class="add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add</div><img class="thumb" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=300&q=80"/><img class="thumb" src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=300&q=80"/></div></div>
+    <div class="pad" style="margin-top:16px"><div class="lbl">Common areas</div><div class="thumbs"><div class="add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add</div><img class="thumb" src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=300&q=80"/></div></div>
+    <div class="pad" style="margin-top:22px">
+      <div class="lbl">Listing title</div><div class="inp ph" style="margin-bottom:15px">Sunny 1-bed with great light</div>
+      <div class="lbl">Neighborhood</div><div class="inp ph" style="margin-bottom:15px">e.g. Fenway</div>
+      <div style="display:flex;gap:12px"><div style="flex:1"><div class="lbl">From</div><div class="inp">&nbsp;</div></div><div style="flex:1"><div class="lbl">Until</div><div class="inp">&nbsp;</div></div></div>
+      <div style="display:flex;gap:12px;margin-top:15px"><div style="flex:1"><div class="lbl">Your rent ($)</div><div class="inp">&nbsp;</div></div><div style="flex:1"><div class="lbl">Asking ($/mo)</div><div class="inp">&nbsp;</div></div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:20px"><div><div style="font-weight:700;font-size:14.5px">My lease allows subletting</div><div class="faint">You stay on your lease</div></div><div class="tg"></div></div>
+      <div class="calc"><div class="l"><span>Sublet term</span><span>3 months</span></div><div class="l"><span>Subly fee (10%)</span><span>−$315</span></div><div class="l big"><b>You keep</b><span class="keep">$2,835</span></div></div>
+      <div style="height:16px"></div>
+      <button class="btn teal">Submit for review</button>
+    </div>
+  </div>
+</div>
+
+<!-- 5. DEALS -->
+<div class="cap">5 · Deals</div>
+<div class="screen">
+  <div class="sb"><span>9:41</span><span style="font-weight:700">􀙇 􀛨 􀋦</span></div>
+  <div class="pad" style="padding-top:8px"><div class="eyebrow" style="color:var(--terra);margin-bottom:6px">Handovers in motion</div><h1 style="font-size:28px">Your deals</h1></div>
+  <div class="scroll" style="max-height:530px;padding-top:20px">
+    <div class="sec">Asking to take your keys</div>
+    <div class="dcard">
+      <div style="display:flex;align-items:center;gap:11px"><img class="av" style="width:42px;height:42px" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80"/><div><div class="serif" style="font-weight:700;font-size:15px">Jordan Lee</div><div class="faint">for your Fenway place</div></div></div>
+      <p class="muted" style="font-size:14px;margin:12px 0 14px">"Grad student, clean & quiet, can move in June 1. Happy to hop on a call!"</p>
+      <div style="display:flex;gap:10px"><button class="btn teal" style="flex:1;height:46px;font-size:14px">Give the keys</button><button class="btn o" style="flex:1;height:46px;font-size:14px">Decline</button></div>
+    </div>
+    <div class="sec" style="margin-top:24px">In progress</div>
+    <div class="dcard">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="serif" style="font-weight:700;font-size:17px">Fenway, Boston</span><span class="tagm">YOU LENT IT</span></div>
+      <div class="faint" style="margin-top:4px">Keeper: Maya Chen</div>
+      <div class="ledger"><div class="l"><span>Rent escrow</span><span class="held">Held</span></div><div class="l"><span>Deposit escrow</span><span class="held">Held</span></div><div class="l"><span>Subly fee (10%)</span><span style="color:var(--ink);font-weight:700">$315</span></div></div>
+      <button class="btn teal">Confirm move-out &amp; release</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Find</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="4"/><path d="M12 12l7 7M17 17l2-2"/></svg>Lend</div>
+    <div class="tab on"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Deals</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Wallet</div>
+  </div>
+</div>
+
+<!-- 6. WALLET -->
+<div class="cap">6 · Wallet</div>
+<div class="screen">
+  <div class="sb"><span>9:41</span><span style="font-weight:700">􀙇 􀛨 􀋦</span></div>
+  <div class="pad" style="padding-top:8px"><div class="eyebrow" style="color:var(--terra);margin-bottom:6px">Held safe, paid on time</div><h1 style="font-size:28px">Wallet</h1><p class="muted" style="font-size:14px;margin-top:6px">Money moves through Stripe — Subly never holds your cash.</p></div>
+  <div class="scroll" style="max-height:520px;padding-top:20px">
+    <div class="grid2"><div class="stat"><div class="k">Earned so far</div><div class="v" style="color:var(--teal)">$2,835</div></div><div class="stat"><div class="k">In escrow now</div><div class="v" style="color:var(--terra-deep)">1</div></div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span class="serif" style="font-weight:700;font-size:16px">Stripe Connect</span><span class="demo">DEMO MODE</span></div><p class="muted" style="font-size:13.5px;margin-top:8px;line-height:1.45">Add your keys to process real escrow payments — the flow is already wired.</p></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span class="serif" style="font-weight:700;font-size:16px">Identity verified</span><span class="verok">✓ Confirmed</span></div><p class="muted" style="font-size:13.5px;margin-top:8px;line-height:1.45">Stripe Identity confirms every user is real — what makes trusting a stranger with your keys safe.</p></div>
+    <div class="card">
+      <div class="serif" style="font-weight:700;font-size:16px;margin-bottom:8px">How your money stays safe</div>
+      <div class="prot"><span class="pic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><p>Keeper pays rent + deposit up front — held by Stripe, not by a stranger.</p></div>
+      <div class="prot"><span class="pic"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6z"/></svg></span><p>Funds only release to you after move-in is confirmed.</p></div>
+      <div class="prot"><span class="pic"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5M20 12a8 8 0 0 1-14 5"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></span><p>Deposit auto-refunds at move-out if there's no damage claim.</p></div>
+      <div class="prot"><span class="pic"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="4"/><path d="M11 11l8 8M17 17l2-2"/></svg></span><p>Subly's 10% is taken automatically — no invoicing, no chasing.</p></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Find</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="4"/><path d="M12 12l7 7M17 17l2-2"/></svg>Lend</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Deals</div>
+    <div class="tab on"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Wallet</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

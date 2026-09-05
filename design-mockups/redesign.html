@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Subly — full redesign</title>
+<style>
+  :root{
+    --bg:#fff; --ink:#1c1c1e; --muted:#6b6b70; --faint:#9a9aa0;
+    --line:#ececec; --wash:#f6f5f3; --accent:#ff3d68; --accentink:#e11d48;
+    --green:#0f9d6a; --amber:#b45309;
+    --san:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#e9e7e3;font-family:var(--san);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .rail{max-width:440px;margin:0 auto;padding:28px 16px 80px}
+  .cap{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8f;margin:34px 4px 12px}
+  .cap:first-child{margin-top:0}
+  /* a "screen" = full-bleed app surface, no device chrome */
+  .screen{background:var(--bg);border-radius:26px;overflow:hidden;box-shadow:0 20px 50px -20px rgba(0,0,0,.28);position:relative}
+  .sb{display:flex;justify-content:space-between;align-items:center;padding:14px 22px 6px;font-size:14px;font-weight:700}
+  .sb .dots{display:flex;gap:5px;align-items:center;color:var(--ink)}
+  .sb svg{display:block}
+  .scroll{max-height:720px;overflow-y:auto}
+  .scroll::-webkit-scrollbar{display:none}
+  h1{font-size:28px;letter-spacing:-.5px;line-height:1.08}
+  h2{font-size:21px;letter-spacing:-.3px}
+  .pad{padding:0 22px}
+  .muted{color:var(--muted)} .faint{color:var(--faint);font-size:13px}
+  /* tab bar */
+  .tabs{display:flex;justify-content:space-around;align-items:center;padding:10px 6px 22px;border-top:1px solid var(--line);background:rgba(255,255,255,.94);backdrop-filter:blur(12px)}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--faint)}
+  .tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9}
+  .tab.on{color:var(--accent)}
+  /* buttons */
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:52px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-family:inherit;font-size:16px;font-weight:700;letter-spacing:-.2px;cursor:pointer}
+  .btn.g{background:var(--green)}
+  .btn.o{background:#fff;color:var(--ink);border:1.5px solid #dcdcdc}
+  /* pills */
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:9px 15px;border-radius:999px;border:1px solid #e2e2e2;background:#fff;font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+  .pill.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .frow{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+  .frow::-webkit-scrollbar{display:none}
+  /* field */
+  .lbl{font-size:13.5px;font-weight:700;margin:0 0 7px}
+  .inp{width:100%;border:1px solid #e0e0e0;border-radius:12px;padding:14px 15px;font-family:inherit;font-size:15px;color:var(--ink);background:#fff}
+  .inp.ph{color:var(--faint)}
+  /* listing card (Explore) */
+  .lc{margin:0 22px 26px}
+  .lc .ph{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:20/17;background:var(--wash)}
+  .lc .ph img{width:100%;height:100%;object-fit:cover;display:block}
+  .badge{position:absolute;top:12px;left:12px;display:inline-flex;align-items:center;gap:5px;background:#fff;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.14)}
+  .heart{position:absolute;top:12px;right:12px;width:34px;height:34px;display:grid;place-items:center}
+  .heart svg{width:25px;height:25px;stroke:#fff;fill:rgba(0,0,0,.18);stroke-width:2}
+  .lc .top{display:flex;justify-content:space-between;align-items:flex-start;margin-top:11px;gap:10px}
+  .lc .place{font-size:16px;font-weight:700}
+  .lc .rtag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--muted);background:var(--wash);padding:4px 9px;border-radius:999px;white-space:nowrap}
+  .lc .desc{color:var(--muted);font-size:14px;margin-top:2px}
+  .lc .dt{color:var(--faint);font-size:13px;margin-top:1px}
+  .lc .price{font-size:16px;font-weight:700;margin-top:7px}
+  .lc .price span{color:var(--muted);font-weight:500}
+  /* hero (onboarding + detail) */
+  .hero{position:relative;height:330px}
+  .hero img{width:100%;height:100%;object-fit:cover;display:block}
+  .hero .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,0) 30%,rgba(0,0,0,.62) 100%)}
+  .hero .ov{position:absolute;left:22px;right:22px;bottom:26px;color:#fff}
+  .brandrow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .mk{width:30px;height:30px;border-radius:9px;background:var(--accent);display:grid;place-items:center}
+  .mk svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+  .brand{font-size:20px;font-weight:800;letter-spacing:-.3px}
+  .hero h1{color:#fff;font-size:30px;font-weight:800}
+  .hero p{color:rgba(255,255,255,.92);font-size:14.5px;line-height:1.45;margin-top:8px}
+  .sheet{position:relative;margin-top:-22px;background:#fff;border-radius:24px 24px 0 0;padding:20px 0 8px}
+  .grip{width:38px;height:4px;border-radius:2px;background:#e2e2e2;margin:2px auto 16px}
+  .trust{display:flex;justify-content:space-between;padding:22px 4px 6px}
+  .trust div{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted)}
+  .trust svg{width:15px;height:15px;stroke:var(--accent);fill:none;stroke-width:2}
+  /* stat row */
+  .stats{display:flex;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:18px}
+  .stats div{flex:1;padding:14px;text-align:center;border-right:1px solid var(--line)}
+  .stats div:last-child{border-right:0}
+  .stats .k{font-size:12px;color:var(--faint);font-weight:600}
+  .stats .v{font-size:16px;font-weight:700;margin-top:3px}
+  .hr{height:1px;background:var(--line);margin:20px 22px}
+  .hostrow{display:flex;align-items:center;gap:12px;padding:0 22px}
+  .av{width:46px;height:46px;border-radius:50%;object-fit:cover;background:var(--wash)}
+  .circ{position:absolute;top:16px;width:36px;height:36px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+  .circ svg{width:19px;height:19px;stroke:var(--ink);fill:none;stroke-width:2}
+  /* photo upload */
+  .thumbs{display:flex;gap:10px;overflow-x:auto;padding-bottom:2px}
+  .thumbs::-webkit-scrollbar{display:none}
+  .add{flex:0 0 82px;height:82px;border-radius:13px;border:1.6px dashed var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--accent);font-size:11px;font-weight:600}
+  .add svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.8}
+  .thumb{flex:0 0 82px;height:82px;border-radius:13px;object-fit:cover}
+  /* toggle */
+  .tg{width:50px;height:30px;border-radius:999px;background:var(--accent);position:relative;flex:0 0 auto}
+  .tg::after{content:'';position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  /* calc + ledger card */
+  .calc{background:var(--wash);border-radius:16px;padding:16px 18px;margin-top:18px}
+  .calc .l{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;color:var(--muted)}
+  .calc .l.big{border-top:1px solid #e6e4e0;margin-top:6px;padding-top:12px}
+  .calc .l.big b{font-size:17px;color:var(--ink)}
+  .calc .l.big .keep{font-size:17px;font-weight:800;color:var(--green)}
+  /* deal card */
+  .dcard{margin:0 22px 16px;border:1px solid var(--line);border-radius:18px;padding:16px}
+  .tagm{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--muted);background:var(--wash);padding:4px 9px;border-radius:999px}
+  .ledger{background:var(--wash);border-radius:13px;padding:12px 14px;margin:12px 0 14px}
+  .ledger .l{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13.5px;color:var(--muted)}
+  .held{font-size:11px;font-weight:700;color:var(--green);background:#e3f5ee;padding:3px 9px;border-radius:999px}
+  .sec{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 22px 10px}
+  /* payments */
+  .card{margin:0 22px 14px;border:1px solid var(--line);border-radius:18px;padding:16px}
+  .demo{font-size:11px;font-weight:700;color:var(--amber);background:#fdf0e0;padding:4px 10px;border-radius:999px}
+  .verok{font-size:11px;font-weight:700;color:var(--green);background:#e3f5ee;padding:4px 10px;border-radius:999px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 22px 14px}
+  .stat{border:1px solid var(--line);border-radius:18px;padding:16px}
+  .stat .k{font-size:12.5px;color:var(--faint);font-weight:600}
+  .stat .v{font-size:30px;font-weight:800;letter-spacing:-.5px;margin-top:4px}
+  .prot{display:flex;gap:12px;align-items:flex-start;padding:8px 0}
+  .prot svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:1.9;flex:0 0 auto;margin-top:2px}
+  .prot p{font-size:13.5px;color:var(--muted);line-height:1.4}
+  .msgbox{border:1px solid #e0e0e0;border-radius:12px;padding:13px 15px;color:var(--faint);font-size:14px;min-height:56px}
+</style>
+</head>
+<body>
+<div class="rail">
+
+<!-- 1. ONBOARDING -->
+<div class="cap">1 · Onboarding</div>
+<div class="screen">
+  <div class="scroll">
+    <div class="hero">
+      <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80" alt=""/>
+      <div class="scrim"></div>
+      <div class="ov">
+        <div class="brandrow"><span class="mk"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.6 7.6a5 5 0 1 0-1 1L21 3"/><circle cx="16" cy="8" r="1.2"/></svg></span><span class="brand">subly</span></div>
+        <h1>Away for a while?<br>Sublet it.</h1>
+        <p>Traveling, working remote, or gone for the season — hand your place to a vetted subletter and keep ~75% of your rent.</p>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <div class="pad">
+        <h2>Create your profile</h2>
+        <p class="muted" style="margin:5px 0 20px;font-size:14px">Takes 20 seconds. Browse freely.</p>
+        <div class="lbl">Your name</div>
+        <div class="inp" style="margin-bottom:16px">Jordan Rivera</div>
+        <div class="lbl">Email</div>
+        <div class="inp ph" style="margin-bottom:18px">jordan@email.com</div>
+        <div class="lbl">Your city</div>
+        <div class="frow" style="margin-bottom:18px"><span class="pill on">Boston</span><span class="pill">New York</span><span class="pill">SF</span><span class="pill">LA</span><span class="pill">Chicago</span></div>
+        <div class="lbl">Why might you sublet?</div>
+        <div class="row" style="margin-bottom:22px">
+          <span class="pill on">✈ Traveling</span><span class="pill">💻 Working remotely</span><span class="pill">💼 Internship</span><span class="pill">☀ Away for summer</span>
+        </div>
+        <button class="btn">Get started →</button>
+        <div class="trust">
+          <div><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Vetted takers</div>
+          <div><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Escrow-safe</div>
+          <div><svg viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/></svg>Keep ~75%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. EXPLORE -->
+<div class="cap">2 · Explore</div>
+<div class="screen">
+  <div class="sb"><span>9:41</span><span class="dots"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg><svg width="24" height="11" viewBox="0 0 25 11"><rect x=".5" y=".5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="18" height="7" rx="1.4"/><rect x="22" y="3.5" width="1.5" height="4" rx=".4"/></svg></span></div>
+  <div class="pad" style="padding-top:6px"><h1>Explore</h1><p class="muted" style="font-size:14px;margin-top:3px">Vetted sublets you can move into</p></div>
+  <div class="frow pad" style="margin:14px 0 18px"><span class="pill on">All cities</span><span class="pill">Boston</span><span class="pill">New York</span><span class="pill">SF</span><span class="pill">LA</span></div>
+  <div class="scroll" style="max-height:560px">
+    <div class="lc">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80"/><span class="badge">✓ Verified</span><span class="heart"><svg viewBox="0 0 24 24"><path d="M12 21C5 15 2 11 2 7.5A4.5 4.5 0 0 1 12 5a4.5 4.5 0 0 1 10 2.5C22 11 19 15 12 21z"/></svg></span></div>
+      <div class="top"><span class="place">Fenway, Boston</span><span class="rtag">💼 Internship</span></div>
+      <div class="desc">Sunny room in a bright Fenway apartment</div>
+      <div class="dt">Jun 1 – Aug 31</div>
+      <div class="price">$1,050 <span>/ month</span></div>
+    </div>
+    <div class="lc">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"/><span class="badge">✓ Verified</span><span class="heart"><svg viewBox="0 0 24 24"><path d="M12 21C5 15 2 11 2 7.5A4.5 4.5 0 0 1 12 5a4.5 4.5 0 0 1 10 2.5C22 11 19 15 12 21z"/></svg></span></div>
+      <div class="top"><span class="place">Williamsburg, New York</span><span class="rtag">💻 Remote</span></div>
+      <div class="desc">Cozy 1-bed steps from the L train</div>
+      <div class="dt">Sep 1 – Dec 20</div>
+      <div class="price">$1,950 <span>/ month</span></div>
+    </div>
+    <div class="lc">
+      <div class="ph"><img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800&q=80"/><span class="badge">✓ Verified</span><span class="heart"><svg viewBox="0 0 24 24"><path d="M12 21C5 15 2 11 2 7.5A4.5 4.5 0 0 1 12 5a4.5 4.5 0 0 1 10 2.5C22 11 19 15 12 21z"/></svg></span></div>
+      <div class="top"><span class="place">Back Bay, Boston</span><span class="rtag">✈ Traveling</span></div>
+      <div class="desc">Furnished studio, away for the summer</div>
+      <div class="dt">Jul 1 – Dec 31</div>
+      <div class="price">$1,350 <span>/ month</span></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab on"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Explore</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>List</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Deals</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Payments</div>
+  </div>
+</div>
+
+<!-- 3. LISTING DETAIL -->
+<div class="cap">3 · Listing detail</div>
+<div class="screen">
+  <div class="scroll">
+    <div class="hero" style="height:300px">
+      <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=80"/>
+      <span class="circ" style="left:16px"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></span>
+      <span class="circ" style="right:16px"><svg viewBox="0 0 24 24"><path d="M12 21C5 15 2 11 2 7.5A4.5 4.5 0 0 1 12 5a4.5 4.5 0 0 1 10 2.5C22 11 19 15 12 21z"/></svg></span>
+    </div>
+    <div class="pad" style="padding-top:18px">
+      <h2>Fenway, Boston</h2>
+      <p style="margin-top:5px">Sunny room in a bright Fenway apartment</p>
+      <p class="faint" style="margin-top:5px">123 Hemenway St, Boston</p>
+      <div class="stats"><div><div class="k">Price</div><div class="v">$1,050/mo</div></div><div><div class="k">Term</div><div class="v">3 months</div></div><div><div class="k">Host</div><div class="v">Maya</div></div></div>
+    </div>
+    <div class="hr"></div>
+    <div class="pad"><h2 style="font-size:17px;margin-bottom:8px">About this place</h2><p class="muted" style="font-size:14px;line-height:1.5">Bright corner room with a shared kitchen and living room. Five minutes to the T, laundry in the building. Dates are a little flexible — message me.</p></div>
+    <div style="height:18px"></div>
+    <div class="hostrow"><img class="av" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80"/><div><div style="font-weight:700">Maya Chen</div><div class="faint">Verified host · responds within a day</div></div></div>
+    <div class="pad" style="margin-top:18px">
+      <div class="lbl">Message to host</div>
+      <div class="msgbox">Tell them a bit about yourself…</div>
+      <div style="height:14px"></div>
+      <button class="btn">Request to sublet</button>
+      <p class="faint" style="text-align:center;margin-top:12px;line-height:1.4">Rent &amp; deposit are held in escrow by Subly.<br>You never pay a stranger directly.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 4. LIST YOUR PLACE -->
+<div class="cap">4 · List your place</div>
+<div class="screen">
+  <div class="sb"><span>9:41</span><span class="dots"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg></span></div>
+  <div class="scroll" style="max-height:640px">
+    <div class="pad" style="padding-top:6px"><h1 style="font-size:26px">List your place</h1><p class="muted" style="font-size:14px;margin-top:4px">Photos, dates, price. We verify, market it, and handle the money.</p></div>
+    <div class="pad" style="margin-top:20px"><div class="lbl">Your room</div><div class="thumbs"><div class="add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add</div><img class="thumb" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=300&q=80"/><img class="thumb" src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=300&q=80"/></div></div>
+    <div class="pad" style="margin-top:16px"><div class="lbl">Common areas</div><div class="thumbs"><div class="add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add</div><img class="thumb" src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=300&q=80"/></div></div>
+    <div class="pad" style="margin-top:20px">
+      <div class="lbl">Listing title</div><div class="inp ph" style="margin-bottom:15px">Sunny 1-bed with great light</div>
+      <div class="lbl">Address</div><div class="inp" style="margin-bottom:15px">&nbsp;</div>
+      <div class="lbl">Neighborhood</div><div class="inp ph" style="margin-bottom:15px">e.g. Fenway</div>
+      <div style="display:flex;gap:12px"><div style="flex:1"><div class="lbl">Start date</div><div class="inp">&nbsp;</div></div><div style="flex:1"><div class="lbl">End date</div><div class="inp">&nbsp;</div></div></div>
+      <div style="display:flex;gap:12px;margin-top:15px"><div style="flex:1"><div class="lbl">Monthly rent ($)</div><div class="inp">&nbsp;</div></div><div style="flex:1"><div class="lbl">Asking ($/mo)</div><div class="inp">&nbsp;</div></div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:20px"><div><div style="font-weight:700;font-size:14.5px">My lease permits subletting</div><div class="faint">You stay liable on your lease</div></div><div class="tg"></div></div>
+      <div class="calc"><div class="l"><span>Sublet term</span><span>3 mo</span></div><div class="l"><span>Subly fee (10%)</span><span>−$315</span></div><div class="l big"><b>You keep</b><span class="keep">$2,835</span></div></div>
+      <div style="height:16px"></div>
+      <button class="btn">Submit for review</button>
+    </div>
+  </div>
+</div>
+
+<!-- 5. DEALS -->
+<div class="cap">5 · Deals</div>
+<div class="screen">
+  <div class="sb"><span>9:41</span><span class="dots"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg></span></div>
+  <div class="pad" style="padding-top:6px"><h1>Deals</h1></div>
+  <div class="scroll" style="max-height:540px;padding-top:18px">
+    <div class="sec">Requests to your place</div>
+    <div class="dcard">
+      <div style="display:flex;align-items:center;gap:11px"><img class="av" style="width:40px;height:40px" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80"/><div><div style="font-weight:700">Jordan Lee</div><div class="faint">wants your Fenway place</div></div></div>
+      <p class="muted" style="font-size:14px;margin:11px 0 14px">"Grad student, clean & quiet, can move in June 1. Happy to hop on a call!"</p>
+      <div style="display:flex;gap:10px"><button class="btn" style="flex:1;height:46px;font-size:14px">Pick as subletter</button><button class="btn o" style="flex:1;height:46px;font-size:14px">Decline</button></div>
+    </div>
+    <div class="sec" style="margin-top:22px">Active deals</div>
+    <div class="dcard">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:16px">Fenway, Boston</span><span class="tagm">YOU HOST</span></div>
+      <div class="faint" style="margin-top:3px">Subletter: Maya Chen</div>
+      <div class="ledger"><div class="l"><span>Rent escrow</span><span class="held">Held</span></div><div class="l"><span>Deposit escrow</span><span class="held">Held</span></div><div class="l"><span>Subly fee (10%)</span><span style="color:var(--ink);font-weight:600">$315</span></div></div>
+      <button class="btn g">Confirm move-out &amp; release</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Explore</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>List</div>
+    <div class="tab on"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Deals</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Payments</div>
+  </div>
+</div>
+
+<!-- 6. PAYMENTS -->
+<div class="cap">6 · Payments</div>
+<div class="screen">
+  <div class="sb"><span>9:41</span><span class="dots"><svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".6"/><rect x="4" y="5" width="3" height="6" rx=".6"/><rect x="8" y="3" width="3" height="8" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg></span></div>
+  <div class="pad" style="padding-top:6px"><h1>Payments</h1><p class="muted" style="font-size:14px;margin-top:3px">Money moves through Stripe — Subly never holds your cash.</p></div>
+  <div class="scroll" style="max-height:520px;padding-top:18px">
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:16px">Stripe Connect</span><span class="demo">DEMO MODE</span></div><p class="muted" style="font-size:13.5px;margin-top:8px;line-height:1.4">Add your keys to process real escrow payments — the flow is already wired.</p></div>
+    <div class="grid2"><div class="stat"><div class="k">Total earned</div><div class="v" style="color:var(--green)">$2,835</div></div><div class="stat"><div class="k">In escrow now</div><div class="v" style="color:var(--accent)">1</div></div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:16px">Identity verification</span><span class="verok">Verified</span></div><p class="muted" style="font-size:13.5px;margin-top:8px;line-height:1.4">Stripe Identity confirms every user is real — what makes picking a stranger safe.</p></div>
+    <div class="card">
+      <div style="font-weight:700;font-size:16px;margin-bottom:6px">How escrow protects you</div>
+      <div class="prot"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p>Taker pays rent + deposit up front — held by Stripe, not a stranger.</p></div>
+      <div class="prot"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6z"/></svg><p>Funds only release to the host after move-in is confirmed.</p></div>
+      <div class="prot"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5M20 12a8 8 0 0 1-14 5"/><path d="M18 3v4h-4M6 21v-4h4"/></svg><p>Deposit auto-refunds at move-out if there's no damage claim.</p></div>
+      <div class="prot"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg><p>Subly's 10% fee is taken automatically — no chasing.</p></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Explore</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>List</div>
+    <div class="tab"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Deals</div>
+    <div class="tab on"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Payments</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

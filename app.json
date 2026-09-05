@@ -1,17 +1,28 @@
 {
   "expo": {
-    "name": "subly",
+    "name": "Subly",
     "slug": "subly",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "subly",
+    "splash": {
+      "backgroundColor": "#FBF7F4",
+      "resizeMode": "contain",
+      "image": "./assets/splash-icon.png"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.subly.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Subly needs access to your photos so you can upload pictures of your room and common areas for your sublet listing."
+      }
     },
     "android": {
+      "package": "com.subly.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FF385C",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -20,6 +31,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-image-picker"
+    ]
   }
 }
